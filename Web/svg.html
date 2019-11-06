@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SVG交互</title>
+    <script src="jquery.js" type="text/javascript"></script>
+    <script src="svg-pan-zoom.js"></script>
+    <style>
+        .show-style {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!--1.加载SVG的object方式-->
+    <!-- <object id="svg-test" data="https://ruitu-demo.oss-cn-hangzhou.aliyuncs.com/parking-lot-svg/0034d3dee8b3e30cfbf3e1b647ff22a4.svg" class="show-style" onload="zoom(this)"></object> -->
+    <!-- <object id="svg-test" data="park.svg" class="show-style" onload="zoom(this)"></object> -->
+    <div id="selProject" class="show-style"></div>
+    <!-- <img src="https://ruitu-demo.oss-cn-hangzhou.aliyuncs.com/parking-lot-svg/0034d3dee8b3e30cfbf3e1b647ff22a4.svg" alt=""> -->
+    <!--2.加载SVG的embed方式-->
+    <!-- <embed id="svg-test" src="park.svg" class="show-style"  onload="zoom(this)"> -->
+    <script type="text/javascript" language="javascript">
+        function readTextFile(rawFile) {
+            svg = rawFile.getElementsByTagName('svg');
+            svg[0].setAttribute('id', 'svg-test')
+            svg[0].setAttribute('class', 'show-style')
+            let selProject = document.getElementById('selProject');
+            selProject.appendChild(rawFile.rootElement);
+            svgPanZoom('#svg-test', {
+                zoomEnabled: true,         //开启缩放功能
+                controlIconsEnabled: true,  //开启右下角缩放控件功能
+            })
+            var array = document.getElementsByTagName('g')
+            let lastPark;
+            for (let index = 0; index < array.length; index++) {
+                let element = array[index];
+                if (element.id.indexOf("park") != -1) {
+                    let area_no = element;
+                    if (area_no) {
+                        area_no.addEventListener("touchstart", function () {
+                            if (lastPark) {
+                                lastPark.style.fill = '#FDF2E1';
+                            }
+                            let rect = area_no.getElementsByTagName('rect');
+                            let car = rect[0];
+                            car.style.fill = 'orange';
+                            lastPark = car;
+                        }, false);
+                        area_no.addEventListener('click', function () {
+                            if (lastPark) {
+                                lastPark.style.fill = '#FDF2E1';
+                            }
+                            let rect = area_no.getElementsByTagName('rect');
+                            let car = rect[0];
+                            car.style.fill = 'orange';
+                            lastPark = car;
+                        }, false)
+                    }
+                }
+            }
+        }
+/**
+* 从 URL 中获取参数
+*/
+        function getQueryString(n, s) {
+            s = s || location.href;
+            var r = new RegExp('^.*\\?(?:' + n + '=|.+=.*&' + n + '=)([^&]+).*', 'i');
+            console.log(r)
+            if (r.test(s)) {
+                return decodeURIComponent(s.replace(r, '$1'));
+            } else {
+                return '';
+            }
+        }
+        var pName = {};
+        pName.svgId = getQueryString("parkId");
+        pName.svgId = getQueryString("svgId");
+        pName.url = getQueryString("url");
+        pName.url = 'http://192.168.124.13:3000';
+        $.ajax({
+            url: pName.url + '/download/' +  pName.svgId,   
+            type: 'get',
+            success: function (res) {
+                // var parser = new DOMParser();
+                // var xmlObject = parser.parseFromString(res.data, "text/xml");
+                readTextFile(res);
+            }
+        });
+
+    </script>
+</body>
+
+</html>
