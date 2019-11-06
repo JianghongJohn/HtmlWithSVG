@@ -45,6 +45,7 @@
             })
             var array = document.getElementsByTagName('g')
             let lastPark;
+            let startPark;
             for (let index = 0; index < array.length; index++) {
                 let element = array[index];
                 if (element.id.indexOf("park") != -1) {
@@ -62,19 +63,30 @@
                         area_no.addEventListener('click', function () {
                             if (lastPark) {
                                 lastPark.style.fill = '#FDF2E1';
+                                startPark.parentElement.removeChild(startPark);
                             }
                             let rect = area_no.getElementsByTagName('rect');
                             let car = rect[0];
                             car.style.fill = 'orange';
                             lastPark = car;
+                                startPark = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                                // startPark.setAttributeNS(null,'transform', car.getAttribute('transform'))
+                                startPark.setAttributeNS(null,'height','20');
+                                startPark.setAttributeNS(null,'width','20');
+                                startPark.setAttributeNS('http://www.w3.org/1999/xlink','href', 'start.png');
+                                startPark.setAttributeNS(null,'x',car.getAttribute('x')-5);
+                                startPark.setAttributeNS(null,'y',car.getAttribute('y')-10);
+                                startPark.setAttributeNS(null, 'visibility', 'visible');
+                                area_no.appendChild(startPark);
+
                         }, false)
                     }
                 }
             }
         }
-/**
-* 从 URL 中获取参数
-*/
+        /**
+        * 从 URL 中获取参数
+        */
         function getQueryString(n, s) {
             s = s || location.href;
             var r = new RegExp('^.*\\?(?:' + n + '=|.+=.*&' + n + '=)([^&]+).*', 'i');
@@ -91,7 +103,7 @@
         pName.url = getQueryString("url");
         pName.url = 'http://192.168.124.13:3000';
         $.ajax({
-            url: pName.url + '/download/' +  pName.svgId,   
+            url: pName.url + '/download/' + pName.svgId,
             type: 'get',
             success: function (res) {
                 // var parser = new DOMParser();
